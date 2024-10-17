@@ -15,16 +15,16 @@ from utils import load_model, batch_infer, process_dataframe
 
 def get_trec_datasets(dataset_folder):
     with open(os.path.join(dataset_folder, 'trec_cds/topics-2014_2015-description.topics'), 'r') as document:
-    d = document.read()
-    soup = BeautifulSoup(d, 'xml')
-    qid = soup.find_all('NUM')
-    query = soup.find_all('TITLE')
-    lq = []
-    for i in qid:
-        lq.append(i.text)
-    ld = []
-    for x in query:
-        ld.append(x.text)
+        d = document.read()
+        soup = BeautifulSoup(d, 'xml')
+        qid = soup.find_all('NUM')
+        query = soup.find_all('TITLE')
+        lq = []
+        for i in qid:
+            lq.append(i.text)
+        ld = []
+        for x in query:
+            ld.append(x.text)
     trec_cds = pd.DataFrame({'qid': lq,'query': ld})
 
     trec_cds["query"] = trec_cds["query"]
@@ -59,28 +59,28 @@ def main(model_name, dataset_folder):
     ]
     assert model_name in models, f"Model {model_name} not found in available models: {models}"
 
-    display(f"\n{'='*50}")
-    display(f"Processing model: {model_name}")
-    display(f"{'='*50}")
+    print(f"\n{'='*50}")
+    print(f"Processing model: {model_name}")
+    print(f"{'='*50}")
 
     try:
-        display(f"Loading model: {model_name}")
+        print(f"Loading model: {model_name}")
         model_data = load_model(model_name)
-        display(f"Model {model_name} loaded successfully")
+        print(f"Model {model_name} loaded successfully")
 
         for df_name, df in dataframes:
             if df is None:
-                display(f"Skipping dataframe {df_name} due to loading error")
+                print(f"Skipping dataframe {df_name} due to loading error")
                 continue
             df.name = df_name
             output_folder = os.path.join(dataset_folder, df_name) + '/'
             process_dataframe(df, output_folder, model_data, model_name)
 
-        display(f"Completed processing all dataframes with {model_name}")
+        print(f"Completed processing all dataframes with {model_name}")
 
     except Exception as e:
-        display(f"Error processing with {model_name}: {str(e)}")
-        display("Traceback:")
+        print(f"Error processing with {model_name}: {str(e)}")
+        print("Traceback:")
         import traceback
         traceback.print_exc()
 
@@ -90,8 +90,12 @@ def main(model_name, dataset_folder):
             del model_data
         torch.cuda.empty_cache()
         gc.collect()
-        display(f"Cleanup completed for {model_name}")
+        print(f"Cleanup completed for {model_name}")
 
-    display(f"{'='*50}\n")
+    print(f"{'='*50}\n")
 
-    display("All dataframes processed.")
+    print("All dataframes processed.")
+
+
+if __name__ == '__main__':
+    main()
